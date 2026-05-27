@@ -1,0 +1,41 @@
+name: Placemux CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-test-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run lint checks
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build Docker image
+        run: docker build -t placemux-backend .
+
+      - name: Smoke test application
+        run: |
+          docker run -d -p 3000:3000 --name placemux-test placemux-backend
+          sleep 5
+          curl http://localhost:3000/health
+          docker stop placemux-test

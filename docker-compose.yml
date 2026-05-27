@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  placemux-backend:
+    build: .
+    container_name: placemux-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    restart: always
